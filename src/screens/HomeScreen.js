@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Animated, ScrollView, StyleSheet, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context'; // SafeAreaView 임포트
 import Header from '../components/templates/Header';
@@ -6,12 +6,12 @@ import FamilyList from '../components/organisms/FamilyList';
 import CalendarDatepicker from '../components/molecules/CalendarDatepicker';
 import WeekDays from '../components/organisms/WeekDays';
 import TimeBlockList from '../components/organisms/TimeBlockList';
-import MockTasks from '../datas/MockTasks';
-import Profiles from '../datas/Profiles';
 import FloatingButton from '../components/atoms/FloatingButton';
+import Profiles from '../datas/Profiles';
 import moment from 'moment';
 import 'moment/locale/ko';
 import colors from '../styles/colors';
+import axios from 'axios'; // axios 임포트
 
 moment.locale('ko'); // 애플리케이션 전역에서 한글로 설정
 
@@ -21,8 +21,11 @@ const HomeScreen = () => {
   // 주 상태 관리
   const [currentWeek, setCurrentWeek] = useState(moment().startOf('week')); // 현재 주의 시작일
   const weekDates = Array.from({ length: 7 }, (_, i) =>
-    currentWeek.clone().add(i, 'days')
+      currentWeek.clone().add(i, 'days')
   );
+
+  // 백엔드에서 가져온 일정 데이터 상태
+  const [tasks, setTasks] = useState([]);
 
   // FamilyList 컴포넌트의 높이와 투명도 애니메이션 설정
   const familyListHeight = scrollY.interpolate({
@@ -40,47 +43,61 @@ const HomeScreen = () => {
   // 타임라인 시간 배열
   const hours = Array.from({ length: 24 }, (_, index) => index); // 0 ~ 23 생성
 
+  // 백엔드에서 일정 데이터 가져오기
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('http://192.168.123.104:8080/api/careCalendar/all');
+        console.log('백엔드에서 받은 데이터:', response.data);
+        setTasks(response.data); // 받은 데이터를 상태에 저장
+      } catch (error) {
+        console.error("API 요청 실패:", error);
+
+      }
+    };
+
+    fetchData();
+  }, []); // 컴포넌트가 마운트될 때 한 번만 실행
+
   return (
-    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.primary001 }}>
-      <Header />
+      <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.primary001 }}>
+        <Header />
 
-      {/* 애니메이션이 적용된 FamilyList 컴포넌트 */}
-      <Animated.View
-        style={[
-          styles.familyListContainer,
-          { height: familyListHeight, opacity: familyListOpacity },
-        ]}
-      >
-        <FamilyList Profiles={Profiles} />
-      </Animated.View>
+        {/* 애니메이션이 적용된 FamilyList 컴포넌트 */}
+        <Animated.View
+            style={[styles.familyListContainer, { height: familyListHeight, opacity: familyListOpacity }]}
+        >
+          <FamilyList Profiles={Profiles} />
+        </Animated.View>
 
-      {/* CalendarDatepicker + Weekdays 컴포넌트 */}
-      <View style={styles.datePickerContainer}>
-        <CalendarDatepicker currentWeek={currentWeek} setCurrentWeek={setCurrentWeek} />
-        <WeekDays currentWeek={currentWeek} />
-      </View>
-
-      {/* 일정 렌더링 */}
-      <ScrollView
-        style={styles.scrollContainer}
-        contentContainerStyle={styles.scrollContent}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false }
-        )}
-      >
-        {/* 위클리 컴포넌트 렌더링 */}
-        <View style={styles.weeklyContent}>
-          {/* 타임블록 렌더링 */}
-          <View style={styles.timeblockContainer}>
-            <TimeBlockList tasks={MockTasks} weekDates={weekDates}/>
-          </View>
+        {/* CalendarDatepicker + Weekdays 컴포넌트 */}
+        <View style={styles.datePickerContainer}>
+          <CalendarDatepicker currentWeek={currentWeek} setCurrentWeek={setCurrentWeek} />
+          <WeekDays currentWeek={currentWeek} />
         </View>
-      </ScrollView>
 
-      {/* 플로팅 카테고리 버튼 */}
-      <FloatingButton />
-    </SafeAreaView>
+        {/* 일정 렌더링 */}
+        <ScrollView
+            style={styles.scrollContainer}
+            contentContainerStyle={styles.scrollContent}
+            onScroll={Animated.event(
+                [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+                { useNativeDriver: false }
+            )}
+        >
+          {/* 위클리 컴포넌트 렌더링 */}
+          <View style={styles.weeklyContent}>
+            {/* 타임블록 렌더링 */}
+            <View style={styles.timeblockContainer}>
+              {/* 백엔드에서 받은 데이터로 TimeBlockList 렌더링 */}
+              <TimeBlockList tasks={tasks} weekDates={weekDates} />
+            </View>
+          </View>
+        </ScrollView>
+
+        {/* 플로팅 카테고리 버튼 */}
+        <FloatingButton />
+      </SafeAreaView>
   );
 };
 

@@ -25,87 +25,106 @@ const calculateBlockHeight = (startTime, endTime) => {
 
 const TimeBlockList = ({ tasks, weekDates }) => {
   const categoryColors = {
-    '식사': colors.scheduleMeal,
-    '병원': colors.scheduleHospital,
-    '휴식': colors.scheduleBreak,
-    '기타': colors.scheduleEtc,
-    '내 일정': colors.gray400,
+    'meal': colors.scheduleMeal,
+    'hospital': colors.scheduleHospital,
+    'rest': colors.scheduleBreak,
+    'others': colors.scheduleEtc,
+    'myCalendar': colors.gray400,
   };
 
   return (
-    <View style={styles.timelineContainer}>
-      {/* 시간 슬롯 표시 */}
-      {Array.from({ length: 24 }).map((_, index) => (
-        <View
-          key={index}
-          style={[
-            styles.timeSlot,
-            index === 0 && styles.firstTimeSlot,
-          ]}
-        >
-          <Text style={styles.timeText}>
-            {index < 12 ? '오전\n' : '오후\n'} {index % 12 === 0 ? 12 : index % 12}시
-          </Text>
-        </View>
-      ))}
+      <View style={styles.timelineContainer}>
+        {/* 시간 슬롯 표시 */}
+        {Array.from({ length: 24 }).map((_, index) => (
+            <View
+                key={index}
+                style={[
+                  styles.timeSlot,
+                  index === 0 && styles.firstTimeSlot,
+                ]}
+            >
+              <Text style={styles.timeText}>
+                {index < 12 ? '오전\n' : '오후\n'} {index % 12 === 0 ? 12 : index % 12}시
+              </Text>
+            </View>
+        ))}
 
-      {/* 날짜별 Task 처리 */}
-      {weekDates.map((weekDate) => {
-        // 같은 날짜의 Task를 필터링하고 시작 시간 순으로 정렬
-        const tasksOnDate = tasks
-          .filter((task) => task.date === weekDate.format('YYYY-MM-DD'))
-          .sort((a, b) => timeToPosition(a.startTime) - timeToPosition(b.startTime));
+        {/* 날짜별 Task 처리 */}
+        {weekDates.map((weekDate) => {
+          // 같은 날짜의 Task를 필터링하고 시작 시간 순으로 정렬
+          const tasksOnDate = tasks
+              .filter((task) => task.date === weekDate.format('YYYY-MM-DD'))
+              .sort((a, b) => timeToPosition(a.startTime) - timeToPosition(b.startTime));
 
-        return tasksOnDate.map((task, index) => {
-          const top = timeToPosition(task.startTime);
-          const height = calculateBlockHeight(task.startTime, task.endTime);
+          return tasksOnDate.map((task, index) => {
+            const top = timeToPosition(task.startTime);
+            const height = calculateBlockHeight(task.startTime, task.endTime);
 
-          const currentDay = weekDates.findIndex(
-            (date) => date.format('YYYY-MM-DD') === task.date
-          );
+            const currentDay = weekDates.findIndex(
+                (date) => date.format('YYYY-MM-DD') === task.date
+            );
 
-          if (currentDay === -1) return null;
+            if (currentDay === -1) return null;
 
-          const totalWidth = 100 - LEFT_PADDING - RIGHT_PADDING - GAP_BETWEEN_COLUMNS * (DAYS_IN_WEEK - 1);
-          const widthPercentage = totalWidth / DAYS_IN_WEEK;
-          const leftPercentage = LEFT_PADDING + currentDay * (widthPercentage + GAP_BETWEEN_COLUMNS);
+            const totalWidth = 100 - LEFT_PADDING - RIGHT_PADDING - GAP_BETWEEN_COLUMNS * (DAYS_IN_WEEK - 1);
+            const widthPercentage = totalWidth / DAYS_IN_WEEK;
+            const leftPercentage = LEFT_PADDING + currentDay * (widthPercentage + GAP_BETWEEN_COLUMNS);
 
-          const backgroundColor = categoryColors[task.category];
+            const backgroundColor = categoryColors[task.category] || colors.scheduleEtc; // fallback color
 
-          // 공백 계산
-          if (index > 0) {
-            const previousTask = tasksOnDate[index - 1];
-            const prevEnd = timeToPosition(previousTask.endTime);
-            const currentStart = top;
+            // 공백 계산
+            if (index > 0) {
+              const previousTask = tasksOnDate[index - 1];
+              const prevEnd = timeToPosition(previousTask.endTime);
+              const currentStart = top;
 
-            if (currentStart > prevEnd) {
-              const gapHeight = currentStart - prevEnd;
+              if (currentStart > prevEnd) {
+                const gapHeight = currentStart - prevEnd;
 
-              return (
-                <React.Fragment key={`gap-${task.id}`}>
-                  {/* 공백 블록 */}
-                  <View
-                    style={[
-                      styles.alertBlock,
-                      {
-                        top: prevEnd,
-                        height: gapHeight,
-                        left: `${leftPercentage}%`,
-                        width: `${widthPercentage}%`,
-                      },
-                    ]}
-                  >
-                    {/* 공백 아이콘 */}
-                    <View style={styles.alertIcon}>
-                      <Image
-                        source={AlertIcon}
-                       
-                      />
-                    </View>
-                  </View>
+                return (
+                    <React.Fragment key={`gap-${weekDate.format('YYYY-MM-DD')}-${task.startTime}`}>
+                      {/* 공백 블록 */}
+                      <View
+                          style={[
+                            styles.alertBlock,
+                            {
+                              top: prevEnd,
+                              height: gapHeight,
+                              left: `${leftPercentage}%`,
+                              width: `${widthPercentage}%`,
+                            },
+                          ]}
+                      >
+                        {/* 공백 아이콘 */}
+                        <View style={styles.alertIcon}>
+                          <Image source={AlertIcon} />
+                        </View>
+                      </View>
 
-                  {/* 현재 Task */}
-                  <View
+                      {/* 현재 Task */}
+                      <View
+                          style={[
+                            styles.block,
+                            {
+                              top,
+                              height,
+                              left: `${leftPercentage}%`,
+                              width: `${widthPercentage}%`,
+                              backgroundColor,
+                            },
+                          ]}
+                      >
+                        <Text style={styles.blockText}>{task.title}</Text>
+                      </View>
+                    </React.Fragment>
+                );
+              }
+            }
+
+            // Task 블록 렌더링
+            return (
+                <View
+                    key={`${weekDate.format('YYYY-MM-DD')}-${task.startTime}`} // Use a unique key
                     style={[
                       styles.block,
                       {
@@ -116,35 +135,13 @@ const TimeBlockList = ({ tasks, weekDates }) => {
                         backgroundColor,
                       },
                     ]}
-                  >
-                    <Text style={styles.blockText}>{task.title}</Text>
-                  </View>
-                </React.Fragment>
-              );
-            }
-          }
-
-          // Task 블록 렌더링
-          return (
-            <View
-              key={task.id}
-              style={[
-                styles.block,
-                {
-                  top,
-                  height,
-                  left: `${leftPercentage}%`,
-                  width: `${widthPercentage}%`,
-                  backgroundColor,
-                },
-              ]}
-            >
-              <Text style={styles.blockText}>{task.title}</Text>
-            </View>
-          );
-        });
-      })}
-    </View>
+                >
+                  <Text style={styles.blockText}>{task.title}</Text>
+                </View>
+            );
+          });
+        })}
+      </View>
   );
 };
 
@@ -190,7 +187,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary003,
     borderRadius: 8,
     zIndex: 1,
-    //padding: 5,
     justifyContent: 'flex-start', // 내부 요소를 상단 정렬
     alignItems: 'center', // 수평 중앙 정렬
   },
