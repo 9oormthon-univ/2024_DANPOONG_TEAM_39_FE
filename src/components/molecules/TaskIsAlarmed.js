@@ -38,7 +38,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginVertical: 8,
   },
   labelWithIcon: {
     flexDirection: 'row', // 텍스트와 아이콘을 가로로 배치

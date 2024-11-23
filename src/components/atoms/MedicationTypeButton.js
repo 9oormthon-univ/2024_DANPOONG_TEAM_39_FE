@@ -31,6 +31,15 @@ const MedicationTypeButton = ({ onAddType, onDeleteType }) => {
 
   return (
     <View style={styles.container}>
+      {/* 제목과 */}
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>
+          <Text style={styles.required}>*</Text> 복약 종류
+        </Text>
+      </View>
+
+
+
       <View style={styles.typeList}>
         {/* 추가 버튼 */}
         {!isEditing && (
@@ -86,11 +95,10 @@ const MedicationTypeButton = ({ onAddType, onDeleteType }) => {
             {longPressedType === type && (
               <TouchableOpacity onPress={() => handleDeleteType(type)}>
                 <Icon
-  
                   name="trash-outline"
                   size={20}
                   color={colors.primary001}
-                  style={{ marginLeft: 4}}
+                  style={{ marginLeft: 4 }}
                 />
               </TouchableOpacity>
             )}
@@ -104,10 +112,23 @@ const MedicationTypeButton = ({ onAddType, onDeleteType }) => {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
+    flexDirection: 'column',
     gap: 8,
+  },
+  titleContainer: {
+    flexDirection: 'row', // 가로로 배치
+    alignItems: 'center', // 세로 중앙 정렬
+  },
+  title: {
+    fontSize: 16,
+    fontFamily: fonts.semiBold,
+    color: colors.gray800,
+    marginBottom: 8,
+  },
+  required: {
+    color: colors.primary001,
+    fontSize: 16,
+    fontFamily: fonts.semiBold,
   },
   addButton: {
     flexDirection: 'row',
@@ -137,14 +158,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     backgroundColor: colors.gray050,
   },
-  inputSmall: {
-    //width: 100,
-    fontSize: 16,
-    fontFamily: fonts.semiBold,
-    color: colors.gray900,
-  },
   inputLarge: {
-    //width: 200, // 이 부분을 조정하여 크기 변경
     fontSize: 16,
     fontFamily: fonts.semiBold,
     color: colors.gray900,

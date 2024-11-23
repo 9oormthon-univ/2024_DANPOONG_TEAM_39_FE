@@ -12,6 +12,8 @@ import TimePicker from '../components/atoms/TimePicker';
 import StartTimeEndTime from '../components/molecules/StartTimeEndTime';
 import TaskIsAlarmed from '../components/molecules/TaskIsAlarmed';
 import TaskRepeat from '../components/atoms/TaskRepeat';
+import TaskPlace from '../components/molecules/TaskPlace';
+import TaskMemo from '../components/molecules/TaskMemo';
 
 const AddPillTask = ({ route }) => {
     const [selectedCategory, setSelectedCategory] = useState(route.params?.selectedCategory || null);
@@ -78,6 +80,14 @@ const AddPillTask = ({ route }) => {
 
                 {/* 반복 설정 */}
                 <TaskRepeat />
+
+                {/* 장소 */}
+                <TaskPlace />
+
+                {/* 메모 */}
+                <TaskMemo />
+
+
             </ScrollView>
         </View>
     );

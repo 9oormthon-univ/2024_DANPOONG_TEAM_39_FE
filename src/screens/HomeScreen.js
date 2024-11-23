@@ -39,6 +39,8 @@ const HomeScreen = () => {
     extrapolate: 'clamp',
   });
 
+
+  
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.primary001 }}>
       <Header />
