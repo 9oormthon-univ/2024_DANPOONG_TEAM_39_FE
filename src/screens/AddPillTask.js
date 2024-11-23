@@ -87,7 +87,6 @@ const AddPillTask = ({ route }) => {
                 {/* 메모 */}
                 <TaskMemo />
 
-
             </ScrollView>
         </View>
     );

@@ -31,14 +31,6 @@ const MedicationTypeButton = ({ onAddType, onDeleteType }) => {
 
   return (
     <View style={styles.container}>
-      {/* 제목과 */}
-      <View style={styles.titleContainer}>
-        <Text style={styles.title}>
-          <Text style={styles.required}>*</Text> 복약 종류
-        </Text>
-      </View>
-
-
 
       <View style={styles.typeList}>
         {/* 추가 버튼 */}
@@ -98,7 +90,7 @@ const MedicationTypeButton = ({ onAddType, onDeleteType }) => {
                   name="trash-outline"
                   size={20}
                   color={colors.primary001}
-                  style={{ marginLeft: 4 }}
+                  style={{ marginLeft: 4}}
                 />
               </TouchableOpacity>
             )}
@@ -130,6 +122,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: fonts.semiBold,
   },
+
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -158,6 +151,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     backgroundColor: colors.gray050,
   },
+
   inputLarge: {
     fontSize: 16,
     fontFamily: fonts.semiBold,
